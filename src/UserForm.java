@@ -69,7 +69,8 @@ public class UserForm {
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize() 
+	{
 		frame = new JFrame();
 		frame.setBounds(100, 100, 1124, 737);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -237,7 +238,7 @@ public class UserForm {
         return EntityUtils.toString(entity, StandardCharsets.UTF_8);
 	}
 	
-	private static Review AddComToRest(String Name, String restaurant_id, String rating, String Review)
+	private static Review AddComToRest(String Name, String restaurant_id, String rating, String Review) // add ne comment for selected rest
 	{
 		Review com = new Review();
 		com.setRestaurant_id(Integer.parseInt(restaurant_id));
