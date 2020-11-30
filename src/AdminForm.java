@@ -92,31 +92,12 @@ public class AdminForm {
 		
 		ArrayList<String> RestIdPool = new ArrayList<String>();
 		
-		JButton btnNewButton = new JButton("Добавить ресторан");
-		btnNewButton.addActionListener(new ActionListener() 
-		{
-			public void actionPerformed(ActionEvent arg0) 
-			{
-				String Path = "https://gachirest.herokuapp.com/restaurants"; //to who url
-		    	Restaurant rest = CreateNewRest(textField.getText(),textField_1.getText(),textField_2.getText());
-		    	Gson gson = new Gson();
-		        String json = gson.toJson(rest);
-		        System.out.println(json);
-		        try 
-		        {
-		        	String ans = SenderPOST(Path, json);
-		        	System.out.println(ans);
-		        }catch(IOException Ex) {System.out.println("Error: "+ Ex);}
-			}
-		});
-		btnNewButton.setBounds(200, 369, 180, 23);
-		frame.getContentPane().add(btnNewButton);
-		
 		JButton btnNewButton_1 = new JButton("Загрузить список");
 		btnNewButton_1.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
+				model.clear();
 				String Path = "https://gachirest.herokuapp.com/restaurants/"; //url with json to steal
 				try {
 					String ans = SenderGET(Path);
@@ -135,6 +116,7 @@ public class AdminForm {
 									BigJson.getData().getRestaurants().get(i).getAverage_rating()+"/5");
 							
 							RestIdPool.add(BigJson.getData().getRestaurants().get(i).getId()); // add id into list for load comments later
+						
 						}
 					}
 				} catch (IOException Ex) {System.out.println("Error: "+ Ex);} 
@@ -142,6 +124,28 @@ public class AdminForm {
 		});
 		btnNewButton_1.setBounds(200, 338, 180, 23);
 		frame.getContentPane().add(btnNewButton_1);
+		
+		JButton btnNewButton = new JButton("Добавить ресторан");
+		btnNewButton.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				String Path = "https://gachirest.herokuapp.com/restaurants"; //to who url
+		    	Restaurant rest = CreateNewRest(textField.getText(),textField_1.getText(),textField_2.getText());
+		    	Gson gson = new Gson();
+		        String json = gson.toJson(rest);
+		        System.out.println(json);
+		        try 
+		        {
+		        	String ans = SenderPOST(Path, json);
+		        	System.out.println(ans);
+		        	btnNewButton_1.doClick();
+		        }catch(IOException Ex) {System.out.println("Error: "+ Ex);}
+			}
+		});
+		btnNewButton.setBounds(200, 369, 180, 23);
+		frame.getContentPane().add(btnNewButton);
+		
 		
 		JButton btnNewButton_2 = new JButton("Удалить ресторан");
 		btnNewButton_2.addActionListener(new ActionListener() 
@@ -159,6 +163,7 @@ public class AdminForm {
 						{
 							String ans = SenderDEL(Path+RestID);
 							System.out.println(ans);
+							btnNewButton_1.doClick();
 						}catch(IOException Ex) {System.out.println("Error: "+ Ex);} 
 					}
 				}
@@ -189,6 +194,7 @@ public class AdminForm {
 						{
 							String ans = SenderPUT(Path+RestID, json);
 				        	System.out.println(ans);
+				        	btnNewButton_1.doClick();
 						}catch(IOException Ex) {System.out.println("Error: "+ Ex);} 
 					}
 				}

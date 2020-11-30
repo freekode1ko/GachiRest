@@ -36,6 +36,7 @@ import javax.swing.JTextPane;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextArea;
+import java.awt.Color;
 
 public class UserForm {
 
@@ -72,6 +73,7 @@ public class UserForm {
 	private void initialize() 
 	{
 		frame = new JFrame();
+		frame.getContentPane().setForeground(Color.GRAY);
 		frame.setBounds(100, 100, 1124, 737);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -88,6 +90,7 @@ public class UserForm {
 		{
 			public void actionPerformed(ActionEvent arg0) 
 			{
+				model.clear();
 				String Path = "https://gachirest.herokuapp.com/restaurants/"; //url with json to steal
 				try {
 					String ans = SenderGET(Path);
@@ -119,6 +122,7 @@ public class UserForm {
 		{
 			public void actionPerformed(ActionEvent arg0) 
 			{
+				model_1.clear();
 				if(!RestIdPool.isEmpty())
 				{
 					String Path = "https://gachirest.herokuapp.com/restaurants/";
@@ -185,6 +189,7 @@ public class UserForm {
 							System.out.println(json);
 							String ans = SenderPOST(Path+RestID+"/addReview/", json);
 							System.out.println(ans);
+							btnNewButton_1.doClick();
 							//todo add shit to list, clear shit etc
 						}
 						catch(Exception ex) {};
