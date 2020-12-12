@@ -91,13 +91,14 @@ public class AdminForm {
 		frame.getContentPane().add(textField_2);
 		
 		ArrayList<String> RestIdPool = new ArrayList<String>();
-		
+	
 		JButton btnNewButton_1 = new JButton("«агрузить список");
 		btnNewButton_1.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
 				model.clear();
+				RestIdPool.clear();
 				String Path = "https://gachirest.herokuapp.com/restaurants/"; //url with json to steal
 				try {
 					String ans = SenderGET(Path);
@@ -115,8 +116,7 @@ public class AdminForm {
 									BigJson.getData().getRestaurants().get(i).getPrice_range()+"/5, рейтинг пользователей: "+ 
 									BigJson.getData().getRestaurants().get(i).getAverage_rating()+"/5");
 							
-							RestIdPool.add(BigJson.getData().getRestaurants().get(i).getId()); // add id into list for load comments later
-						
+							RestIdPool.add(BigJson.getData().getRestaurants().get(i).getId()); // add id into list for load comments later		
 						}
 					}
 				} catch (IOException Ex) {System.out.println("Error: "+ Ex);} 
