@@ -37,6 +37,10 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextArea;
 import java.awt.Color;
+import javax.swing.JRadioButton;
+import javax.swing.JCheckBox;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class UserForm {
 
@@ -45,6 +49,7 @@ public class UserForm {
 	public JList<String> list_1 = new JList();
 	private JTextField textField;
 	private JTextArea textField_1;
+	private JTextField textField_2;
 
 	/**
 	 * Launch the application.
@@ -57,7 +62,7 @@ public class UserForm {
 			{try {
 					UserForm window = new UserForm();
 					window.frame.setVisible(true);
-				 } catch (Exception e) {	e.printStackTrace();}
+				 } catch (Exception e) {e.printStackTrace();}
 			}
 		});
 	}
@@ -73,6 +78,7 @@ public class UserForm {
 	private void initialize() 
 	{
 		frame = new JFrame();
+
 		frame.getContentPane().setForeground(Color.GRAY);
 		frame.setBounds(100, 100, 1124, 737);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -84,6 +90,9 @@ public class UserForm {
 		list_1 = new JList<>(model_1);
 		
 		ArrayList<String> RestIdPool = new ArrayList<String>();
+		ArrayList<String> RestNamePool = new ArrayList<String>();
+		ArrayList<String> RestPlacePool = new ArrayList<String>();
+		ArrayList<String> RestRatePool = new ArrayList<String>();
 		
 		JButton btnNewButton = new JButton("Загрузить");
 		btnNewButton.addActionListener(new ActionListener() //BUTT
@@ -91,6 +100,7 @@ public class UserForm {
 			public void actionPerformed(ActionEvent arg0) 
 			{
 				model.clear();
+				RestIdPool.clear();
 				String Path = "https://gachirest.herokuapp.com/restaurants/"; //url with json to steal
 				try {
 					String ans = SenderGET(Path);
@@ -109,6 +119,9 @@ public class UserForm {
 									BigJson.getData().getRestaurants().get(i).getAverage_rating()+"/5");
 							
 							RestIdPool.add(BigJson.getData().getRestaurants().get(i).getId()); // add id into list for load comments later
+							RestNamePool.add(BigJson.getData().getRestaurants().get(i).getName());
+							RestPlacePool.add(BigJson.getData().getRestaurants().get(i).getLocation());
+							RestRatePool.add(BigJson.getData().getRestaurants().get(i).getPrice_range().toString());	
 						}
 					}
 				} catch (IOException Ex) {System.out.println("Error: "+ Ex);} 
@@ -117,10 +130,17 @@ public class UserForm {
 		btnNewButton.setBounds(10, 538, 135, 23);
 		frame.getContentPane().add(btnNewButton);
 			
-		JButton btnNewButton_1 = new JButton("Открыть коментарии"); // butt real rest comments
-		btnNewButton_1.addActionListener(new ActionListener() 
+		frame.addWindowListener(new WindowAdapter() //load rests on start program
 		{
-			public void actionPerformed(ActionEvent arg0) 
+			@Override
+			public void windowOpened(WindowEvent arg0) 
+			{btnNewButton.doClick();}
+		});
+		
+		JButton btnNewButton_1 = new JButton("Открыть коментарии"); // butt real rest comments
+		btnNewButton_1.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent arg0)
 			{
 				model_1.clear();
 				if(!RestIdPool.isEmpty())
@@ -128,9 +148,9 @@ public class UserForm {
 					String Path = "https://gachirest.herokuapp.com/restaurants/";
 					int selectedRest = list.getSelectedIndex(); // get secelted rest
 					String RestID = RestIdPool.get(selectedRest); // get id of selected rest
-					if(selectedRest != -1) 
+					if(selectedRest != -1)
 					{
-						try 
+						try
 						{
 							String ans = SenderGET(Path+RestID+"/");
 							System.out.println(Path+RestID+"/"); //log to who
@@ -145,7 +165,6 @@ public class UserForm {
 											", Коммернтарий к оценке: " + BigJson.getData().getReviews().get(i).getReview()); // read comment
 							}
 						}catch (IOException Ex) {System.out.println("Error: "+ Ex);} 
-						
 					}
 				}
 			}
@@ -200,11 +219,103 @@ public class UserForm {
 		btnNewButton_2.setBounds(354, 603, 155, 23);
 		frame.getContentPane().add(btnNewButton_2);
 		
+		JCheckBox chckbxName = new JCheckBox("Имя");
+		chckbxName.setSelected(true);
+		chckbxName.setBounds(537, 599, 51, 23);
+		frame.getContentPane().add(chckbxName);
+		
+		JCheckBox chckbxRate = new JCheckBox("Рейтинг");
+		chckbxRate.setBounds(537, 625, 74, 23);
+		frame.getContentPane().add(chckbxRate);
+		
+		textField_2 = new JTextField();
+		textField_2.setBounds(617, 600, 123, 20);
+		frame.getContentPane().add(textField_2);
+		textField_2.setColumns(10);
+		
+		JComboBox comboBox_1 = new JComboBox();
+		comboBox_1.setModel(new DefaultComboBoxModel(new String[] {"1", "2", "3", "4", "5"}));
+		comboBox_1.setSelectedIndex(0);
+		comboBox_1.setBounds(617, 626, 123, 20);
+		frame.getContentPane().add(comboBox_1);
+		
+		JButton btnNewButton_3 = new JButton("Поиск");
+		btnNewButton_3.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				if(chckbxName.isSelected() || chckbxRate.isSelected())
+				{
+					model.clear();
+					model_1.clear();
+				}
+				
+				if(chckbxName.isSelected())
+				{
+					ArrayList<String> FoundRestIds = FindByName(textField_2.getText(),RestNamePool,RestIdPool);
+					for(int i = 0; i < FoundRestIds.size(); i++)
+					{model.addElement(LoadRestByID(FoundRestIds.get(i)));}
+				}
+				
+				if(chckbxRate.isSelected())
+				{
+					ArrayList<String> FoundRestIds = FindByRate(comboBox_1.getSelectedItem().toString(),RestRatePool,RestIdPool);
+					for(int i = 0; i < FoundRestIds.size(); i++)
+					{model.addElement(LoadRestByID(FoundRestIds.get(i)));}
+				}
+			}
+		});
+		
+		btnNewButton_3.setBounds(537, 571, 203, 23);
+		frame.getContentPane().add(btnNewButton_3);
+		
 		list.setBounds(10, 28, 1088, 212);
 		frame.getContentPane().add(list);
 		
 		list_1.setBounds(10, 294, 1088, 212);
 		frame.getContentPane().add(list_1);
+		
+	}
+	
+	private static ArrayList<String> FindByName(String RestName, ArrayList<String> RestNamePool, ArrayList<String> RestIdPool)
+	{
+		ArrayList<String> IDs = new ArrayList<String>();
+		for(int i = 0; i < RestNamePool.size(); i++)
+			if (RestName.toLowerCase().equals(RestNamePool.get(i).toLowerCase()))
+				IDs.add(RestIdPool.get(i));
+		return IDs;
+	}
+	
+	private static String LoadRestByID(String RestId)
+	{
+		String out = "";
+		String Path = "https://gachirest.herokuapp.com/restaurants/";
+		try
+			{
+				String ans = SenderGET(Path+RestId+"/");
+				System.out.println(Path+RestId+"/"); //log to who
+				System.out.println(ans); //log get json
+				JsonObject jsonObject = new JsonParser().parse(ans).getAsJsonObject(); //str as jsonObj
+				if(jsonObject.isJsonObject() && jsonObject.get("status").getAsString().equals("success")) //if json is correct and status success
+				{
+					Gson gson = new Gson();
+					GETrest2 BigJson = gson.fromJson(ans, GETrest2.class);
+					out = ("Ресторан "+ BigJson.getData().getRestaurants().getName() + " по адрессу: " + 
+							BigJson.getData().getRestaurants().getLocation() +", ценовой рейтинг " +
+							BigJson.getData().getRestaurants().getPrice_range()+"/5, рейтинг пользователей: "+ 
+							BigJson.getData().getRestaurants().getAverage_rating()+"/5"); // read rest
+				}
+			}catch (IOException Ex) {System.out.println("Error: "+ Ex);} 
+		return out;
+	}
+	
+	private static ArrayList<String> FindByRate(String RestRate, ArrayList<String> RestRatePool, ArrayList<String> RestIdPool)
+	{
+		ArrayList<String> IDs = new ArrayList<String>();
+		for(int i = 0; i < RestRatePool.size(); i++)
+			if (RestRate.toLowerCase().equals(RestRatePool.get(i).toLowerCase()))
+				IDs.add(RestIdPool.get(i));
+		return IDs;
 	}
 	
 	private static String SenderGET(String PATH) throws IOException //nudis GET
