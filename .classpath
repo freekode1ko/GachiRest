@@ -4,6 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gson_lib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/HttpClient_lib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/HttpCore_lib"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Logging_lib"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
